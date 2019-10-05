@@ -319,6 +319,10 @@ web-sys = { version = "0.3.25", default-features = false, features = ["Crypto", 
 [target.'cfg(target_os = "windows")'.dependencies]
 winapi = { version = "0.3.7", default-features = false, features = ["ntsecapi", "wtypesbase"] }
 
+[target.'cfg(target_env = "sgx")'.dependencies]
+rand_core = "0.4"
+rdrand = "0.6"
+
 [target.'cfg(target_arch = "wasm32")'.dev-dependencies]
 wasm-bindgen-test = { version = "0.2.48", default-features = false }
 

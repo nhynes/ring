@@ -169,6 +169,7 @@ impl crate::sealed::Sealed for SystemRandom {}
         not(feature = "dev_urandom_fallback")
     ),
     target_arch = "wasm32",
+    target_env = "sgx",
     windows
 ))]
 use self::sysrand::fill as fill_impl;
@@ -294,10 +295,26 @@ mod sysrand_chunk {
     }
 }
 
+#[cfg(target_env = "sgx")]
+mod sysrand_chunk {
+    use crate::error;
+
+    #[inline]
+    pub fn chunk(dest: &mut [u8]) -> Result<usize, error::Unspecified> {
+        use rand_core::RngCore;
+        rdrand::RdRand::new()
+            .map_err(|_| error::Unspecified)?
+            .try_fill_bytes(dest)
+            .map_err(|_| error::Unspecified)?;
+        Ok(dest.len())
+    }
+}
+
 #[cfg(any(
     target_os = "android",
     target_os = "linux",
     target_arch = "wasm32",
+    target_env = "sgx",
     windows
 ))]
 mod sysrand {
